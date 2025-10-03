@@ -109,8 +109,8 @@ class Asteroid {
 
         this.angle = Math.random() * Math.PI * 2;
         this.sides = 5 + Math.floor(Math.random() * 5);
-        this.velocityX = (Math.random() - 0.5) * 4;
-        this.velocityY = (Math.random() - 0.5) * 4;
+        this.velocityX = (Math.random() - 0.5) * 10;
+        this.velocityY = (Math.random() - 0.5) * 10;
 
         this.offsets = [];
         for (let i = 0; i < this.sides; i++) {
@@ -188,7 +188,7 @@ function gameLoop(currentTime) {
     }
 
     // Draw new asteroid randomly
-    if (Math.random() > 0.98) {
+    if (Math.random() > 0.95) {
         asteroids.push(new Asteroid());
     }
 
