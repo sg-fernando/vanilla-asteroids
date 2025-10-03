@@ -183,13 +183,13 @@ function gameLoop(currentTime) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // Fire laser every X ms
-    if (elapsed > 1500) {
+    if (elapsed > 1200) {
         startTime = currentTime;
         lasers.push(new Laser(ship.x, ship.y, ship.angle));
     }
 
     // Draw new asteroid randomly
-    if (Math.random() > 0.95) {
+    if (Math.random() > 0.93) {
         asteroids.push(new Asteroid());
     }
 
