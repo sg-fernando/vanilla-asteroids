@@ -28,8 +28,9 @@ class Ship {
         const dy = mouseY - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance > 10) {
-            this.velocityX = (dx / distance) * 2.5;
-            this.velocityY = (dy / distance) * 2.5;
+            const speed = Math.min(distance / 50, 3);
+            this.velocityX = (dx / distance) * speed;
+            this.velocityY = (dy / distance) * speed;
             this.x += this.velocityX;
             this.y += this.velocityY;
             this.angle = Math.atan2(dy, dx);
