@@ -21,6 +21,7 @@ class Ship {
         this.velocityX = 0;
         this.velocityY = 0;
         this.asteroidsDestroyed = 0;
+        this.alive = true;
     }
     
     update(mouseX, mouseY) {
@@ -76,6 +77,7 @@ class Laser {
         if (this.x <  -(this.length*10) || this.x > canvas.width + (this.length*10) || this.y < -(this.length*10) || this.y > canvas.height + (this.length*10)) {
             lasers = lasers.filter(l => l !== this);
         }
+
     }
 
     draw() {
@@ -136,10 +138,45 @@ class Asteroid {
             const dy = laser.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance < this.radius) {
-                // Collision detected
                 asteroids = asteroids.filter(a => a.id !== this.id);
                 lasers.splice(index, 1);
                 ship.asteroidsDestroyed++;
+            }
+        });
+
+        // Check collision with ship
+        const dx = ship.x - this.x;
+        const dy = ship.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < this.radius) {
+            ship.alive = false;
+        }
+
+        // Check collision with other asteroids
+        asteroids.forEach(other => {
+            if (other.id !== this.id) {
+                const dx = other.x - this.x;
+                const dy = other.y - this.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < this.radius + other.radius) {
+                    const angle = Math.atan2(dy, dx);
+                    const totalMass = this.radius + other.radius;
+                    const newVelX1 = (this.velocityX * (this.radius - other.radius) + (2 * other.radius * other.velocityX)) / totalMass;
+                    const newVelY1 = (this.velocityY * (this.radius - other.radius) + (2 * other.radius * other.velocityY)) / totalMass;
+                    const newVelX2 = (other.velocityX * (other.radius - this.radius) + (2 * this.radius * this.velocityX)) / totalMass;
+                    const newVelY2 = (other.velocityY * (other.radius - this.radius) + (2 * this.radius * this.velocityY)) / totalMass;
+                    this.velocityX = newVelX1;
+                    this.velocityY = newVelY1;
+                    other.velocityX = newVelX2;
+                    other.velocityY = newVelY2;
+
+                    // Separate overlapping asteroids
+                    const overlap = 0.5 * (this.radius + other.radius - distance + 1);
+                    this.x -= overlap * Math.cos(angle);
+                    this.y -= overlap * Math.sin(angle);
+                    other.x += overlap * Math.cos(angle);
+                    other.y += overlap * Math.sin(angle);
+                }
             }
         });
     }
@@ -175,24 +212,23 @@ var previousTime = 0;
 var position = 0;
 var startTime;
 function gameLoop(currentTime) {
-    requestAnimationFrame(gameLoop);
     if (!startTime) startTime = currentTime;
     const elapsed = currentTime - startTime;
-
+    
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+    
     // Fire laser every X ms
     if (elapsed > 1200) {
         startTime = currentTime;
         lasers.push(new Laser(ship.x, ship.y, ship.angle));
     }
-
+    
     // Draw new asteroid randomly
-    if (Math.random() > 0.93) {
+    if (Math.random() > 0.85) {
         asteroids.push(new Asteroid());
     }
-
+    
     
     // Update and draw ship
     ship.update(mouseX, mouseY);
@@ -209,11 +245,22 @@ function gameLoop(currentTime) {
         laser.update();
         laser.draw();
     });
-
+    
     // print number of asteroids
     ctx.fillStyle = '#fff';
     ctx.font = '20px Arial';
     ctx.fillText(`Asteroids Destroyed: ${ship.asteroidsDestroyed}`, 20, 30);
+    
+    if (!ship.alive) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = '50px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Game Over! You destroyed ${ship.asteroidsDestroyed} asteroids.`, canvas.width / 2, canvas.height / 2);
+        return;
+    }
+    requestAnimationFrame(gameLoop);
 }
 
 requestAnimationFrame(gameLoop);
