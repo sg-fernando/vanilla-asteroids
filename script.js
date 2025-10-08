@@ -219,10 +219,6 @@ class Asteroid {
     }
 }
 
-for (let i = 0; i < 5; i++) {
-    asteroids.push(new Asteroid());
-}
-
 var previousTime = 0;
 var position = 0;
 var startTime;
@@ -239,9 +235,15 @@ function gameLoop(currentTime) {
         lasers.push(new Laser(ship.x, ship.y, ship.angle));
     }
     
-    // Draw new asteroid randomly
-    if (Math.random() > 0.85) {
-        asteroids.push(new Asteroid());
+    // Draw new asteroid randomly, if screen size is small, spawn less
+    if (canvas.width < 600) {
+        if (Math.random() > 0.9) {
+            asteroids.push(new Asteroid());
+        }
+    } else {
+        if (Math.random() > 0.85) {
+            asteroids.push(new Asteroid());
+        }
     }
     
     
