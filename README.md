@@ -8,8 +8,6 @@ Your ship automatically fires laser blasts periodically to destroy incoming aste
 
 Each asteroid destroyed increases your score, but colliding with one ends the game!
 
----
-
 ## 🕹️ Controls
 
 | Action      | Control  |
