@@ -13,6 +13,21 @@ canvas.addEventListener("mousemove", function(e) {
     mouseY = canvasY;
 });
 
+canvas.addEventListener("touchmove", function(e) {
+    e.preventDefault();
+    if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const cRect = canvas.getBoundingClientRect();
+        mouseX = Math.round(touch.clientX - cRect.left);
+        mouseY = Math.round(touch.clientY - cRect.top);
+    }
+}, { passive: false });
+
+window.addEventListener("resize", function() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+
 class Ship {
     constructor() {
         this.x = canvas.width / 2;
@@ -255,9 +270,51 @@ function gameLoop(currentTime) {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#fff';
-        ctx.font = '50px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(`Game Over! You destroyed ${ship.asteroidsDestroyed} asteroids.`, canvas.width / 2, canvas.height / 2);
+
+        const fontSize = Math.min(canvas.width / 15, 40);
+        ctx.font = `${fontSize}px Arial`;
+
+        const lines = [
+            "Game Over!",
+            `You destroyed ${ship.asteroidsDestroyed} asteroids.`
+        ];
+        const lineHeight = fontSize * 1.2;
+        const totalHeight = lines.length * lineHeight;
+        let startY = (canvas.height - totalHeight) / 2 + lineHeight;
+
+        lines.forEach((line, index) => {
+            const textWidth = ctx.measureText(line).width;
+            const x = (canvas.width - textWidth) / 2;
+            const y = startY + index * lineHeight;
+            ctx.fillText(line, x, y);
+        });
+
+        const buttonWidth = 200;
+        const buttonHeight = 50;
+        const buttonX = (canvas.width - buttonWidth) / 2;
+        const buttonY = startY + lines.length * lineHeight + 20;
+
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(buttonX, buttonY, buttonWidth, buttonHeight);
+        ctx.fillStyle = '#000';
+        ctx.font = '20px Arial';
+        const buttonText = "Restart";
+        const textWidth = ctx.measureText(buttonText).width;
+        const textX = buttonX + (buttonWidth - textWidth) / 2;
+        const textY = buttonY + (buttonHeight + 20) / 2;
+        ctx.fillText(buttonText, textX, textY);
+
+        canvas.addEventListener("click", function onClick(e) {
+            // refresh page
+            const cRect = canvas.getBoundingClientRect();
+            const canvasX = Math.round(e.clientX - cRect.left);
+            const canvasY = Math.round(e.clientY - cRect.top);
+            if (canvasX >= buttonX && canvasX <= buttonX + buttonWidth &&
+                canvasY >= buttonY && canvasY <= buttonY + buttonHeight) {
+                window.location.reload();
+            }
+            canvas.removeEventListener("click", onClick);
+        });
         return;
     }
     requestAnimationFrame(gameLoop);
