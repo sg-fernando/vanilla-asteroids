@@ -1,6 +1,6 @@
 # 🚀 Asteroids game
 
-Asteroids game built with HTML Canvas and JavaScript. [Play it on GitHub Pages]([url](https://sg-fernando.github.io/vanilla-asteroids/))
+Asteroids game built with HTML Canvas and JavaScript. [Play it on GitHub Pages.](https://sg-fernando.github.io/vanilla-asteroids/)
 
 You control a small triangular ship that follows your mouse pointer around the screen.
 Asteroids spawn randomly from the edges of the screen and drift across space.
